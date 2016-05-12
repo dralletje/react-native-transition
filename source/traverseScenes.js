@@ -1,9 +1,8 @@
 import React from 'react'
 
-let traverseScenes = (children, fn, flatten = false) => {
-  let flattenResult = []
+let traverseScenes = (children, fn) => {
   let mapChildren = child => {
-    if (!child.props) {
+    if (!child || !child.props) {
       return child
     }
 
@@ -24,19 +23,10 @@ let traverseScenes = (children, fn, flatten = false) => {
         children: React.Children.map(newProps.children || child.props.children, mapChildren),
       }
     )
-    if (flatten) {
-      flattenResult.push(newKid)
-    } else {
-      return newKid
-    }
+    return newKid
   }
 
-  let result = mapChildren(React.Children.only(children))
-  if (flatten) {
-    return flattenResult
-  } else {
-    return result
-  }
+  return mapChildren(React.Children.only(children))
 }
 
 export default traverseScenes
