@@ -36,7 +36,7 @@ let createAnimatable = () => {
   }
 }
 
-const SIDE_BY_SIDE = true
+const SIDE_BY_SIDE = false
 
 /*
 1. Opmeten nieuwe screen buiten het scherm
@@ -164,7 +164,7 @@ let Scene = getContext(contextTypes)(class extends React.Component {
       let deferred = defer()
       refs[sceneKey] = deferred.promise
       return (
-        <SceneProp
+        <SceneView
           {...oldPropsCollection[sceneKey]}
           oldLayout={oldLayout[sceneKey]}
           animated={true}
@@ -243,7 +243,7 @@ let Framework = ({
   )
 }
 
-let SceneProp = ({
+let SceneView = ({
   sceneRef, style,
   oldLayout, isDeletion = false,
   transition: _transition = no_transition,
@@ -292,4 +292,4 @@ let SceneProp = ({
   )
 }
 
-export { Scene, SceneContainer, SceneProp }
+export { Scene, SceneContainer, SceneView }
