@@ -2,14 +2,17 @@ import React from 'react'
 import { Animated, View, Dimensions } from 'react-native'
 import Promise from 'bluebird'
 import invariant from 'invariant'
-import { xor, toArray, difference } from 'lodash'
+import { difference, xor } from 'lodash'
 
 import { withState, withContext, getContext, compose } from 'recompose'
 import defer from './defer'
-import LayoutMeasurer from './Layout'
+import LayoutMeasurer from './LayoutMeasurer'
 import traverseScenes from './traverseScenes'
 
-import { no_transition } from './animations'
+// Import and export transitions
+import transitions from './transitions'
+let { no_transition } = transitions
+export { transitions }
 
 let contextTypes = {
   animatable: React.PropTypes.object,
@@ -33,7 +36,7 @@ let createAnimatable = () => {
   }
 }
 
-const SIDE_BY_SIDE = false
+const SIDE_BY_SIDE = true
 
 /*
 1. Opmeten nieuwe screen buiten het scherm
@@ -228,6 +231,9 @@ let Framework = ({
         style={{
           flex: 1,
           width: Dimensions.get('window').width / 2,
+          borderRightWidth: 1,
+          borderRightColor: 'black',
+          overflow: 'hidden',
         }}
       >
         { newChildren }
@@ -252,6 +258,7 @@ let SceneProp = ({
     typeof _transition === 'function'
     ? _transition
     : _transition.change
+
   if (!oldLayout) {
     transition = _transition.enter
   }

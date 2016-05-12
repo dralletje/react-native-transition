@@ -1,6 +1,5 @@
 import React from 'react';
 import { View , Dimensions, findNodeHandle } from 'react-native';
-import { mapValues } from 'lodash';
 
 import defer from './defer'
 
