@@ -32,6 +32,7 @@ let Scene = getContext(contextTypes)(({ children, animatable, transitionConfig }
     traverseScenes(children, ({ sceneKey, ...props }, Component) => {
       invariant(!propsCollection[sceneKey], `Two children with sceneKey '${sceneKey}'`)
       propsCollection[sceneKey] = { Component, props }
+      return {} // Do iterate it's children as well
     })
 
     // Render and measure

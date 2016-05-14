@@ -41,6 +41,7 @@ let traverseScenes = (children, fn) => {
 
     // If you need a prop called "Component", well... good luck
     let { Component, ...newProps } = result
+
     // Map the new (or old) children with this same function
     let newChildren = React.Children.map(newProps.children || child.props.children, mapChildren)
 
