@@ -34,6 +34,9 @@ let runTransition = (transitionConfig, transitionType, {
     window: Dimensions.get('window'),
   })
 
+  // If returned thing is a function, user most likely forgot config
+  invariant(typeof result !== 'function',
+    `Result of transition function is a function, you most likely need to call the function first once with config options (function ${transition.name}).`)
   // Make sure the transition works alright
   invariant(result && result.props && result.start,
     `Transition function should return an object with shape { props, start } (in function ${transition.name}).`)
