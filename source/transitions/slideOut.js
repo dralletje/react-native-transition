@@ -1,39 +1,28 @@
-import { mapValues } from 'lodash'
 import { Animated } from 'react-native'
-
 import { resetStyle } from './utils'
 
-let slideOut = (side) => ({ top, left, width, height }, dimensions) => {
-  let animateValues =
-    mapValues({ width, height }, (value, layoutProp) => {
-      return new Animated.Value(value)
-    })
+let slideOut = (side) => ({ prevLayout, window }) => {
+  let horizontal = side === 'left' || side === 'right'
+  let animateProp = horizontal ? 'left' : 'top'
+  let selfSize = horizontal ? prevLayout.width : prevLayout.height
+  let screenSize = horizontal ? window.width : window.height
 
-  if (side !== 'bottom') {
-    animateValues.top = new Animated.Value(top)
-  } else {
-    animateValues.bottom = new Animated.Value(dimensions.height - top - height)
-  }
-
-  if (side !== 'right') {
-    animateValues.left = new Animated.Value(left)
-  } else {
-    animateValues.right = new Animated.Value(dimensions.width - left - width)
-  }
+  let animateValue = new Animated.Value(prevLayout[animateProp])
 
   let initialStyle = {
     ...resetStyle,
-    ...animateValues,
+    ...prevLayout,
+    [animateProp]: animateValue,
   }
 
   // Removal does not have nextLayout
   let startAnimation = () => {
-    return Animated.timing(animateValues[side], {
+    return Animated.timing(animateValue, {
       duration: 200,
       toValue: (
-        (side === 'top' || side === 'bottom')
-        ? -height
-        : -width
+        side === 'right' || side === 'bottom'
+        ? screenSize
+        : selfSize
       ),
     })
   }

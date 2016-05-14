@@ -10,8 +10,8 @@ let zero = {
   width: 0,
 }
 
-let no_transition = (oldLayout = zero) => {
-  let animateValues = mapValues(oldLayout, (value, layoutProp) => {
+let no_transition = ({ prevLayout = zero }) => {
+  let animateValues = mapValues(prevLayout, (value, layoutProp) => {
     return new Animated.Value(value)
   })
 

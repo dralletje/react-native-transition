@@ -10,12 +10,12 @@ let sides = {
   both:  { top: true, height: true,  left: true, width: true },
 }
 
-let linear = (side = 'both') => (oldLayout) => {
+let linear = (side = 'both') => ({ prevLayout }) => {
   let sideProps = sides[side]
   invariant(sideProps, 'First argument to `linear` must be either `horizontal`, `vertical` or `both`.')
 
   let animateValues =
-    mapValues(oldLayout, (value, layoutProp) => {
+    mapValues(prevLayout, (value, layoutProp) => {
       return new Animated.Value(value)
     })
 

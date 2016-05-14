@@ -8,6 +8,7 @@
   "main": "source",
   "dependencies": {
     "bluebird": "^3.3.5",
+    "dedent-js": "^1.0.1",
     "lodash": "^4.12.0",
     "react": "^0.14.8",
     "react-native": "^0.25.1",
