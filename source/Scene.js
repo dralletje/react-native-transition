@@ -12,15 +12,14 @@ import { Animated, View, Text } from 'react-native'
 import Promise from 'bluebird'
 import invariant from 'invariant'
 import { difference } from 'lodash'
-import { getContext } from 'recompose'
 
+import scenePropTypes from './scenePropTypes'
 import defer from './defer'
 import Framework from './Framework'
 import traverseScenes from './traverseScenes'
-import contextTypes from './contextTypes'
 import runTransition from './runTransition'
 
-let Scene = getContext(contextTypes)(({ children, animatable, transitionConfig }) => {
+let Scene = ({ children, animatable, transitionConfig }) => {
   // Get layout and props from previous measure
   let old = animatable.get()
 
@@ -150,6 +149,8 @@ let Scene = getContext(contextTypes)(({ children, animatable, transitionConfig }
       childrenToBeRemoved={childrenThatWillBeRemovedInNextIteration}
     />
   )
-})
+}
+
+Scene.PropTypes = scenePropTypes
 
 export default Scene

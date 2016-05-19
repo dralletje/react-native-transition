@@ -1,6 +1,6 @@
 import { PropTypes } from 'react'
 
-let contextTypes = {
+let scenePropTypes = {
   animatable: PropTypes.object,
   transitionConfig: PropTypes.objectOf(
     PropTypes.oneOfType([
@@ -14,4 +14,4 @@ let contextTypes = {
   ).isRequired,
 }
 
-export default contextTypes
+export default scenePropTypes
