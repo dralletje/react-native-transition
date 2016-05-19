@@ -1,14 +1,18 @@
 /*
-1. Render new screen with modifications:
-  - Elements with an 'existing' sceneKey, with the position/style of the old one
-  - Elements that have a 'new' sceneKey, hidden or outside the screen
-  - Elements that are no longer present, are kept on the screen still, and positioned on their old place.
-2. Measure real new screen outside the display
-3. Start animation to new screen layout
+1. Current scene is rendered on the visible screen.
+2. New scene is requested.
+3. Render *new scene outside of the visible screen, and keep the
+   old scene on the visible screen.
+4. Move new scene (with modifications) on visible screen.
+   The modifications should make it look exactly like the old screen.
+   Move old screen outside of the visible screen.
+5. Start animation
+6. New screen should, at the end of the animation, look exactly like... the new screen 😁
+...Start again from step one, with the new scene being the next current scene
 */
 
 import React from 'react'
-import { Animated, View, Text } from 'react-native'
+import { Animated, View, Text, Image } from 'react-native'
 import Promise from 'bluebird'
 import invariant from 'invariant'
 import { difference } from 'lodash'
@@ -19,6 +23,22 @@ import Framework from './Framework'
 import traverseScenes from './traverseScenes'
 import runTransition from './runTransition'
 
+let AnimatedComponents = new Map([
+  [View, Animated.View],
+  [Image, Animated.Image],
+  [Text, Animated.Text],
+])
+
+let getAnimatedComponent = prevComponent => {
+  let Component =
+    AnimatedComponents.has(prevComponent)
+    ? AnimatedComponents.get(prevComponent)
+    : Animated.createAnimatedComponent(prevComponent)
+
+  AnimatedComponents.set(prevComponent, Component)
+  return Component
+}
+
 let Scene = ({ children, animatable, transitionConfig }) => {
   // Get layout and props from previous measure
   let old = animatable.get()
@@ -28,10 +48,15 @@ let Scene = ({ children, animatable, transitionConfig }) => {
   if (!old.layouts) {
     // Save props for possible deletion in next scene
     let propsCollection = {}
-    traverseScenes(children, ({ sceneKey, ...props }, Component) => {
+    let newChildren = traverseScenes(children, ({ sceneKey, ...props }, prevComponent) => {
+      let Component = getAnimatedComponent(prevComponent)
+
       invariant(!propsCollection[sceneKey], `Two children with sceneKey '${sceneKey}'`)
-      propsCollection[sceneKey] = { Component, props }
-      return {} // Do iterate it's children as well
+      propsCollection[sceneKey] = { Component: prevComponent, props }
+      return {
+        ...props,
+        Component,
+      } // Do iterate it's children as well
     })
 
     // Render and measure
@@ -41,6 +66,7 @@ let Scene = ({ children, animatable, transitionConfig }) => {
           animatable.update(realLayouts, propsCollection)
         }}
         children={children}
+        newChildren={newChildren}
       />
     )
   }
@@ -53,7 +79,6 @@ let Scene = ({ children, animatable, transitionConfig }) => {
   // Traverse all the sceneKey-children
   let newChildren = traverseScenes(children, ({ sceneKey, ...nextProps }, prevComponent) => {
     invariant(!refs[sceneKey], `Two children with sceneKey '${sceneKey}'`)
-    invariant(prevComponent === View || prevComponent === Text, `Component with a sceneKey should be Text or View (sceneKey = ${sceneKey})`)
     invariant(!old.props || !old.props[sceneKey] || old.props[sceneKey].Component === prevComponent, `Component type changed for sceneKey '${sceneKey}'`)
 
     // Save the promise that will yield the reference and save the props
@@ -65,7 +90,7 @@ let Scene = ({ children, animatable, transitionConfig }) => {
     }
 
     // Figure out the Animated-version of the component (Custom @TODO ???)
-    let Component = prevComponent === Text ? Animated.Text : Animated.View
+    let Component = getAnimatedComponent(prevComponent)
 
     // When no old layout exists, it means the child is new
     let transitionType = !old.layouts[sceneKey] ? 'ENTER' : 'CHANGE'
